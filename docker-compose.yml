@@ -1,6 +1,6 @@
 
 services:
-  statistics-server:
+  stats-server:
     build:
       context: ./ewm-statistic/ewm-server
       dockerfile: Dockerfile
