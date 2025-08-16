@@ -1,14 +1,32 @@
+version: '3.8'
+
 services:
-  stats-server:
+  statistics-server:
+    build:
+      context: ./ewm-statistic/ewm-server
+      dockerfile: Dockerfile
+    image: java-explore-with-me-statistics
     ports:
       - "9090:9090"
+    depends_on:
+      - db-statistic-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-statistic-server:5432/statistics-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
 
-  stats-db:
+  db-statistic-server:
     image: postgres:16.1
-
-  ewm-service:
+    container_name: db-statistic-server
     ports:
-      - "8080:8080"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: statistics-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      timeout: 5s
+      interval: 5s
+      retries: 10
 
-  ewm-db:
-    image: postgres:16.1
