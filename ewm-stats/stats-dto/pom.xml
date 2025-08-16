@@ -10,7 +10,7 @@
 
     </parent>
 
-    <artifactId>ewm-dto</artifactId>
+    <artifactId>stats-dto</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

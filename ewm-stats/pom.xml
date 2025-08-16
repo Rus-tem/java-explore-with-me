@@ -16,9 +16,9 @@
 
     <name>Statistic</name>
     <modules>
-        <module>ewm-client</module>
-        <module>ewm-server</module>
-        <module>ewm-dto</module>
+        <module>stats-client</module>
+        <module>stats-server</module>
+        <module>stats-dto</module>
     </modules>
 
     <properties>
