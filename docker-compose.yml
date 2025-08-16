@@ -1,4 +1,3 @@
-
 services:
   stats-server:
     build:
@@ -8,15 +7,15 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - db-statistic-server
+      - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db-statistic-server:5432/statistics-db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/statistics-db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
 
-  db-statistic-server:
+  ewm-service:
     image: postgres:16.1
-    container_name: db-statistic-server
+    container_name: ewm-service
     ports:
       - "5432:5432"
     environment:
@@ -28,4 +27,3 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
-
