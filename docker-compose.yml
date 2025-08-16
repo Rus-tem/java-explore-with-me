@@ -1,7 +1,7 @@
 services:
   stats-server:
     build:
-      context: ./ewm-statistic/ewm-server
+      context: ./ewm-stats/stats-server
       dockerfile: Dockerfile
     image: java-explore-with-me-statistics
     ports:

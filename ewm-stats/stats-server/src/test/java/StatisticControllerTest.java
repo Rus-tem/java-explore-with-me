@@ -63,3 +63,4 @@ public class StatisticControllerTest {
                 .andExpect(jsonPath("$[0].hits").value(5));
     }
 }
+
