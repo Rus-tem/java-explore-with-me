@@ -3,18 +3,23 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.server.repository.EndpointHitRepository;
 import ru.practicum.ewm.server.service.StatisticServiceImpl;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class StatisticServiceTest {
+@ActiveProfiles("test")
+class StatisticServiceTest {
+
     @Mock
     private EndpointHitRepository endpointHitRepository;
 
@@ -27,8 +32,12 @@ public class StatisticServiceTest {
     }
 
     @Test
-    void testCreateHit() {
-        EndpointHit hit = new EndpointHit(null, "app1", "/test", "127.0.0.1", LocalDateTime.now());
+    void testCreateHit_callsRepositorySave() {
+        EndpointHit hit = new EndpointHit();
+        hit.setApp("testApp");
+        hit.setUri("/test");
+        hit.setIp("127.0.0.1");
+        hit.setTimestamp(LocalDateTime.now());
 
         statisticService.createHit(hit);
 
@@ -36,21 +45,38 @@ public class StatisticServiceTest {
     }
 
     @Test
-    void testGetStats() {
+    void testGetStats_returnsExpectedData() {
         LocalDateTime start = LocalDateTime.now().minusDays(1);
         LocalDateTime end = LocalDateTime.now();
-        List<String> uris = List.of("/test");
+
+        List<String> uris = Arrays.asList("/default");
         Boolean unique = false;
 
-        ViewStats stats = new ViewStats("app1", "/test", 5L);
+        List<ViewStats> expectedStats = Collections.singletonList(new ViewStats("testApp", "/default", 10L));
+
         when(endpointHitRepository.getAllViewStats(start, end, uris, unique))
-                .thenReturn(List.of(stats));
+                .thenReturn(expectedStats);
 
-        List<ViewStats> result = statisticService.getStats(start, end, uris, unique);
+        List<ViewStats> actualStats = statisticService.getStats(start, end, uris, unique);
 
-        assertEquals(1, result.size());
-        assertEquals("/test", result.get(0).getUri());
-        assertEquals(5L, result.get(0).getHits());
+        assertEquals(expectedStats, actualStats);
+        verify(endpointHitRepository, times(1)).getAllViewStats(start, end, uris, unique);
+    }
+
+    @Test
+    void testGetStats_withNullUrisAndDefaultUnique() {
+        LocalDateTime start = LocalDateTime.now().minusDays(1);
+        LocalDateTime end = LocalDateTime.now();
+
+        List<ViewStats> expectedStats = Collections.singletonList(new ViewStats("testApp", "/default", 10L));
+
+        when(endpointHitRepository.getAllViewStats(start, end, null, false))
+                .thenReturn(expectedStats);
+
+        List<ViewStats> actualStats = statisticService.getStats(start, end, null, false);
+
+        assertEquals(expectedStats, actualStats);
+        verify(endpointHitRepository, times(1)).getAllViewStats(start, end, null, false);
     }
 }
 

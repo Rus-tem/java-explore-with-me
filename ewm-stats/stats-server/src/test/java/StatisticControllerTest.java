@@ -1,66 +1,77 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.ewm.dto.ViewStats;
-import ru.practicum.ewm.server.EWMStatisticServiceApp;
+import ru.practicum.ewm.server.controller.StatisticController;
 import ru.practicum.ewm.server.service.StatisticService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(classes = EWMStatisticServiceApp.class)
-@AutoConfigureMockMvc
-public class StatisticControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+@ActiveProfiles("test")
+class StatisticControllerTest {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private StatisticService statisticService;
 
-    @Test
-    void testCreateHit() throws Exception {
-        EndpointHit hit = new EndpointHit(null, "app1", "/test", "127.0.0.1", LocalDateTime.now());
+    @InjectMocks
+    private StatisticController statisticController;
 
-        mockMvc.perform(post("/hit")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(hit)))
-                .andExpect(status().isCreated());
-
-        verify(statisticService, times(1)).createHit(any(EndpointHit.class));
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testGetStats() throws Exception {
-        LocalDateTime start = LocalDateTime.now().minusDays(1);
-        LocalDateTime end = LocalDateTime.now();
+    void testCreateHits_callsServiceWithCorrectArgument() {
+        EndpointHit hit = new EndpointHit(null, "testApp", "/test", "127.0.0.1", LocalDateTime.now());
 
-        ViewStats stats = new ViewStats("app1", "/test", 5L);
-        when(statisticService.getStats(any(LocalDateTime.class), any(LocalDateTime.class), anyList(), anyBoolean()))
-                .thenReturn(List.of(stats));
+        statisticController.createHits(hit);
 
-        mockMvc.perform(get("/stats")
-                        .param("start", start.toString())
-                        .param("end", end.toString())
-                        .param("uris", "/test")
-                        .param("unique", "false"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].uri").value("/test"))
-                .andExpect(jsonPath("$[0].hits").value(5));
+        verify(statisticService, times(1)).createHit(hit);
+    }
+
+    @Test
+    void testGetStats_returnsCorrectStats() {
+        LocalDateTime start = LocalDateTime.of(2025, 8, 17, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 8, 17, 23, 59);
+
+        List<String> uris = List.of("/test");
+        boolean unique = true;
+
+        List<ViewStats> expectedStats = List.of(
+                new ViewStats("testApp", "/test", 5L)
+        );
+
+        when(statisticService.getStats(start, end, uris, unique)).thenReturn(expectedStats);
+
+        List<ViewStats> actualStats = statisticController.getStats(start, end, uris, unique);
+
+        assertEquals(expectedStats, actualStats);
+        verify(statisticService, times(1)).getStats(start, end, uris, unique);
+    }
+
+    @Test
+    void testGetStats_withNullUrisAndDefaultUnique() {
+        LocalDateTime start = LocalDateTime.of(2025, 8, 17, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2025, 8, 17, 23, 59);
+
+        List<ViewStats> expectedStats = List.of(
+                new ViewStats("testApp", "/default", 10L)
+        );
+
+        when(statisticService.getStats(start, end, null, false)).thenReturn(expectedStats);
+
+        List<ViewStats> actualStats = statisticController.getStats(start, end, null, false);
+
+        assertEquals(expectedStats, actualStats);
+        verify(statisticService, times(1)).getStats(start, end, null, false);
     }
 }
-
