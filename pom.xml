@@ -11,6 +11,9 @@
 	</parent>
 
 	<name>Explore With Me</name>
+	<modules>
+		<module>ewm-stats</module>
+	</modules>
 
 	<groupId>ru.practicum</groupId>
 	<artifactId>explore-with-me</artifactId>
@@ -57,6 +60,11 @@
 							<groupId>com.puppycrawl.tools</groupId>
 							<artifactId>checkstyle</artifactId>
 							<version>10.3</version>
+						</dependency>
+						<dependency>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.38</version>
 						</dependency>
 					</dependencies>
 				</plugin>
