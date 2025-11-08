@@ -2,13 +2,12 @@ package ru.practicum.ewm.main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.ewm.main.dto.*;
+import ru.practicum.ewm.main.dto.State;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,12 +20,12 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "annotation",nullable = false)
+    @Column(name = "annotation", nullable = false)
     private String annotation;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
-    @Column(name = "confirmed_requests",nullable = false)
+    @Column(name = "confirmed_requests", nullable = false)
     private Long confirmedRequests;
     @Column(name = "created_on", nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -34,7 +33,7 @@ public class Event {
     @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "event_date", nullable = false)
-   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     @Column(name = "paid", nullable = false)
     private Boolean paid;
@@ -48,7 +47,6 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private State state;
     @NotBlank
-   // @Size(min = 3, max = 120)
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "views", nullable = false)

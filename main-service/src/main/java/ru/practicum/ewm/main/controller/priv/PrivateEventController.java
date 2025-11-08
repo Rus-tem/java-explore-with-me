@@ -1,5 +1,6 @@
 package ru.practicum.ewm.main.controller.priv;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +8,6 @@ import ru.practicum.ewm.main.dto.event.*;
 import ru.practicum.ewm.main.dto.participationRequest.ParticipationRequestDto;
 import ru.practicum.ewm.main.service.api.EventService;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,7 +18,7 @@ public class PrivateEventController {
     private final EventService eventService;
 
 
-    // Private. Получение списка Event по параметрам+
+    // Private. Получение списка Event по параметрам
     @GetMapping
     public List<EventShortDto> getPrivateUserEvents(@PathVariable Long userId,
                                                     @RequestParam(defaultValue = "0") Integer from,
@@ -26,7 +26,7 @@ public class PrivateEventController {
         return eventService.getPrivateUserEvents(userId, from, size);
     }
 
-    // Private. Получение Event+
+    // Private. Получение Event
     @GetMapping("/{eventId}")
     public EventFullDto getPrivateUserEvent(@PathVariable Long userId,
                                             @PathVariable Long eventId) {
@@ -34,7 +34,7 @@ public class PrivateEventController {
     }
 
 
-    // Private. Получение информации о запросах на участие в событии текущего пользователя --
+    // Private. Получение информации о запросах на участие в событии текущего пользователя
     @GetMapping("/{eventId}/requests")
     public List<ParticipationRequestDto> getPrivateUserEventRequests(@PathVariable Long userId,
                                                                      @PathVariable Long eventId) {
@@ -58,7 +58,6 @@ public class PrivateEventController {
         return eventService.updatePrivateUserEvent(userId, eventId, updateRequest);
     }
 
-    //todo последний в списке
     //Private. Изменение статуса(подтверждения, отмены) заявок на участие в событии текущего пользователя
     @PatchMapping("/{eventId}/requests")
     public EventRequestStatusUpdateResult updateRequestStatus(

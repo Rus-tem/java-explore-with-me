@@ -14,7 +14,7 @@ public class PublicCompilationController {
 
     private final CompilationService compilationService;
 
-    // Получить все подборки
+    // Public. Получить все подборки
     @GetMapping
     public List<CompilationDto> getCompilations(
             @RequestParam(defaultValue = "false") Boolean pinned,
@@ -24,16 +24,11 @@ public class PublicCompilationController {
         return compilationService.getCompilations(pinned, from, size);
     }
 
-    // Получить подборку по id
+    // Public. Получить подборку по id
     @GetMapping("/{compId}")
     public CompilationDto getCompilationById(@PathVariable Long compId) {
         return compilationService.getCompilationById(compId);
     }
-
-
-
-
-
 
 
 }

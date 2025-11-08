@@ -39,9 +39,6 @@ public class CompilationServiceImpl implements CompilationService {
         }
         Compilation compilation = CompilationMapper.mapNewCompilationDtoToCompilation(newCompilationDto);
 
-//        else if (newCompilationDto.getEvents() == null) {
-//            throw new CompilationValidationException("Не указанно поле events");
-//        }
         if (newCompilationDto.getEvents() != null) {
             Set<Event> eventSet = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
             compilation.setEvents(eventSet);
@@ -54,7 +51,9 @@ public class CompilationServiceImpl implements CompilationService {
     // Admin. Обновление Compilation
     @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateRequest) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new CategoryNotFoundException("Compilation с таким id = " + compId + " не найден"));
+
+        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
+                new CategoryNotFoundException("Compilation с таким id = " + compId + " не найден"));
 
         if (updateRequest.getTitle() != null) {
             compilation.setTitle(updateRequest.getTitle());
@@ -62,17 +61,10 @@ public class CompilationServiceImpl implements CompilationService {
         if (updateRequest.getPinned() != null) {
             compilation.setPinned(updateRequest.getPinned());
         }
-
-//        if (updateRequest.getEvents() == null) {
-//            throw new CompilationValidationException("Не указанно поле events");
-//        }
-
-
         if (updateRequest.getEvents() != null) {
             Set<Event> eventSet = new HashSet<>(eventRepository.findAllById(updateRequest.getEvents()));
             compilation.setEvents(eventSet);
         }
-
         Compilation updateCompilation = compilationRepository.save(compilation);
 
         return CompilationMapper.mapToCompilationDto(updateCompilation);
@@ -81,7 +73,8 @@ public class CompilationServiceImpl implements CompilationService {
     // Admin. Удаление Compilation
     @Override
     public void deleteCompilation(Long compId) {
-        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() -> new CategoryNotFoundException("Compilation с таким id = " + compId + " не найден"));
+        Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
+                new CategoryNotFoundException("Compilation с таким id = " + compId + " не найден"));
         compilationRepository.delete(compilation);
     }
 

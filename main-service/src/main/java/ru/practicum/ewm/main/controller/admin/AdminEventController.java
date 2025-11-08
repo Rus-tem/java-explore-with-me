@@ -1,16 +1,14 @@
 package ru.practicum.ewm.main.controller.admin;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.main.dto.event.EventFullDto;
 import ru.practicum.ewm.main.dto.event.UpdateEventAdminRequest;
 import ru.practicum.ewm.main.service.api.EventService;
 
-import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import java.util.List;
+
 @RestController
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
@@ -35,15 +33,9 @@ public class AdminEventController {
     // Admin. Обновление Event
     @PatchMapping("/{eventId}")
     public EventFullDto updateAdminEvent(@PathVariable Long eventId,
-                                        @Valid @RequestBody UpdateEventAdminRequest request) {
+                                         @Valid @RequestBody UpdateEventAdminRequest request) {
         return eventService.updateAdminEvent(eventId, request);
     }
-
-
-
-
-
-
 
 
 }

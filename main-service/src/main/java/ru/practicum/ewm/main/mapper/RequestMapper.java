@@ -3,7 +3,9 @@ package ru.practicum.ewm.main.mapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewm.main.dto.participationRequest.ParticipationRequestDto;
-import ru.practicum.ewm.main.model.*;
+import ru.practicum.ewm.main.model.Event;
+import ru.practicum.ewm.main.model.ParticipationRequest;
+import ru.practicum.ewm.main.model.RequestStatus;
 import ru.practicum.ewm.main.model.User;
 
 import java.time.LocalDateTime;
@@ -30,9 +32,6 @@ public class RequestMapper {
         request.setCreated(LocalDateTime.now());
         return request;
     }
-
-
-
 
 
 }

@@ -27,6 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     // Admin. Создание Category
     @Override
     public CategoryDto createAdminCategory(NewCategoryDto newCategoryDto) {
+
         checkCategoryName(newCategoryDto.getName());
         checkDuplicateCategoryName(newCategoryDto.getName());
         Category category = CategoryMapper.mapNewCategoryDtoToCategory(newCategoryDto);
@@ -40,7 +41,8 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateAdminCategory(Long catId, CategoryDto categoryDto) {
 
         Category oldCategory = categoryRepository.findById(catId).orElseThrow(() ->
-                new CategoryNotFoundException("Category с таким Id = " + catId + " не найдена"));
+                new CategoryNotFoundException("Category с таким id = " + catId + " не найдена"));
+
         if (!categoryDto.getName().equals(oldCategory.getName())) {
             checkCategoryName(categoryDto.getName());
             checkDuplicateCategoryName(categoryDto.getName());
@@ -65,7 +67,8 @@ public class CategoryServiceImpl implements CategoryService {
     // Public. Получение списка Category
     @Override
     public List<CategoryDto> getPublicCategories(Integer from, Integer size) {
-        int page = from / size; // считаем страницу
+
+        int page = from / size;
         return categoryRepository.findAllBy(PageRequest.of(page, size))
                 .stream()
                 .map(CategoryMapper::mapToCategoryDto)

@@ -16,7 +16,7 @@ public class PublicEventController {
 
     private final EventService eventService;
 
-    //Public. Получение подробной информации с возможностью фильтрации--
+    //Public. Получение подробной информации с возможностью фильтрации
     @GetMapping
     public List<EventShortDto> getPublicEvents(
             @RequestParam(required = false) String text,
@@ -27,13 +27,14 @@ public class PublicEventController {
             @RequestParam(defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(defaultValue = "EVENT_DATE") String sort,
             @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request
     ) {
         return eventService.getPublicEvents(text, categories, paid, rangeStart, rangeEnd,
-                onlyAvailable, sort, from, size);
+                onlyAvailable, sort, from, size, request);
     }
 
-    //Public.  Получение подробной информации о событии+
+    //Public.  Получение подробной информации о событии
     @GetMapping("/{eventId}")
     public EventFullDto getPublicEventById(
             @PathVariable Long eventId,

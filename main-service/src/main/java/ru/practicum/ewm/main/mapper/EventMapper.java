@@ -2,7 +2,6 @@ package ru.practicum.ewm.main.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
 import ru.practicum.ewm.main.dto.event.EventFullDto;
 import ru.practicum.ewm.main.dto.event.EventShortDto;
 import ru.practicum.ewm.main.dto.event.NewEventDto;
@@ -10,45 +9,46 @@ import ru.practicum.ewm.main.dto.event.UpdateEventUserRequest;
 import ru.practicum.ewm.main.model.Category;
 import ru.practicum.ewm.main.model.Event;
 import ru.practicum.ewm.main.model.User;
-import java.time.format.DateTimeFormatter;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
 
     public static EventFullDto mapToEventFullDto(Event event) {
-         EventFullDto eventFullDto = new EventFullDto();
-         eventFullDto.setId(event.getId());
-            eventFullDto.setAnnotation(event.getAnnotation());
-            eventFullDto.setCategory(CategoryMapper.mapToCategoryDto(event.getCategory()));
-            eventFullDto.setConfirmedRequests(event.getConfirmedRequests());
-            eventFullDto.setCreatedOn(event.getCreatedOn());
-            eventFullDto.setDescription(event.getDescription());
-            eventFullDto.setEventDate(event.getEventDate());
-            eventFullDto.setInitiator( UserMapper.mapToUserDto(event.getInitiator()));
-            eventFullDto.setLocation(event.getLocation());
-            eventFullDto.setPaid(event.getPaid());
-            eventFullDto.setParticipantLimit(event.getParticipantLimit());
-            eventFullDto.setPublishedOn(event.getPublishedOn());
-            eventFullDto.setRequestModeration(event.getRequestModeration());
-            eventFullDto.setState(event.getState());
-            eventFullDto.setTitle(event.getTitle());
-            eventFullDto.setViews(event.getViews());
-            return eventFullDto;
+        EventFullDto eventFullDto = new EventFullDto();
+        eventFullDto.setId(event.getId());
+        eventFullDto.setAnnotation(event.getAnnotation());
+        eventFullDto.setCategory(CategoryMapper.mapToCategoryDto(event.getCategory()));
+        eventFullDto.setConfirmedRequests(event.getConfirmedRequests());
+        eventFullDto.setCreatedOn(event.getCreatedOn());
+        eventFullDto.setDescription(event.getDescription());
+        eventFullDto.setEventDate(event.getEventDate());
+        eventFullDto.setInitiator(UserMapper.mapToUserDto(event.getInitiator()));
+        eventFullDto.setLocation(event.getLocation());
+        eventFullDto.setPaid(event.getPaid());
+        eventFullDto.setParticipantLimit(event.getParticipantLimit());
+        eventFullDto.setPublishedOn(event.getPublishedOn());
+        eventFullDto.setRequestModeration(event.getRequestModeration());
+        eventFullDto.setState(event.getState());
+        eventFullDto.setTitle(event.getTitle());
+        eventFullDto.setViews(event.getViews());
+        return eventFullDto;
     }
 
     public static EventShortDto eventFullDtoMapToEventShortDto(EventFullDto eventFullDto) {
-            EventShortDto eventShortDto = new EventShortDto();
-            eventShortDto.setId(eventFullDto.getId());
-            eventShortDto.setAnnotation(eventFullDto.getAnnotation());
-            eventShortDto.setCategory(eventFullDto.getCategory());
-            eventShortDto.setConfirmedRequests(eventFullDto.getConfirmedRequests());
-            eventShortDto.setEventDate(eventFullDto.getEventDate());
-            eventShortDto.setInitiator(eventFullDto.getInitiator());
-            eventShortDto.setPaid(eventFullDto.getPaid());
-            eventShortDto.setTitle(eventFullDto.getTitle());
-            eventShortDto.setViews(eventFullDto.getViews());
-            return eventShortDto;
+        EventShortDto eventShortDto = new EventShortDto();
+        eventShortDto.setId(eventFullDto.getId());
+        eventShortDto.setAnnotation(eventFullDto.getAnnotation());
+        eventShortDto.setCategory(eventFullDto.getCategory());
+        eventShortDto.setConfirmedRequests(eventFullDto.getConfirmedRequests());
+        eventShortDto.setEventDate(eventFullDto.getEventDate());
+        eventShortDto.setInitiator(eventFullDto.getInitiator());
+        eventShortDto.setPaid(eventFullDto.getPaid());
+        eventShortDto.setTitle(eventFullDto.getTitle());
+        eventShortDto.setViews(eventFullDto.getViews());
+        return eventShortDto;
     }
 
     public static EventShortDto eventMapToEventShortDto(Event event) {
@@ -109,6 +109,7 @@ public class EventMapper {
 
         return event;
     }
+
     public static void updateEventFromUserRequest(UpdateEventUserRequest request, Event event) {
         if (request.getTitle() != null) {
             event.setTitle(request.getTitle());

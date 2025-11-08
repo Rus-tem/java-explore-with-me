@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService {
 
         Pageable pageable = PageRequest.of(from / size, size);
         Page<User> usersPage;
-
         if (ids != null && !ids.isEmpty()) {
             usersPage = userRepository.findAllByIdIn(ids, pageable);
         } else {
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public void deleteAdminUser(Long userId) {
 
         if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("Пользователь с таким Id = " + userId + " не найден");
+            throw new UserNotFoundException("User с таким Id = " + userId + " не найден");
         }
         userRepository.deleteById(userId);
     }
@@ -88,9 +87,9 @@ public class UserServiceImpl implements UserService {
     public ParticipationRequestDto addPrivateRequest(Long userId, Long eventId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь не найден"));
+                .orElseThrow(() -> new UserNotFoundException("User не найден"));
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Событие не найдено"));
+                .orElseThrow(() -> new EventNotFoundException("Event не найден"));
 
         if (event.getInitiator().getId().equals(userId)) {
             throw new UserConflictException("Инициатор не может подать заявку на своё событие");
