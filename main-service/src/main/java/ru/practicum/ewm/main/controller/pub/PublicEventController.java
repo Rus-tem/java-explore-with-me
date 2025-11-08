@@ -1,12 +1,12 @@
 package ru.practicum.ewm.main.controller.pub;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.main.dto.event.EventFullDto;
 import ru.practicum.ewm.main.dto.event.EventShortDto;
 import ru.practicum.ewm.main.service.api.EventService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,21 +35,11 @@ public class PublicEventController {
 
     //Public.  Получение подробной информации о событии+
     @GetMapping("/{eventId}")
-    public EventFullDto getPublicEventById(@PathVariable Long eventId) {
-        return eventService.getPublicEventById(eventId);
+    public EventFullDto getPublicEventById(
+            @PathVariable Long eventId,
+            HttpServletRequest request) {
+        return eventService.getPublicEventById(eventId, request);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

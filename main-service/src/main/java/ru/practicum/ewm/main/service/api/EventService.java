@@ -1,5 +1,6 @@
 package ru.practicum.ewm.main.service.api;
 
+import jakarta.servlet.http.HttpServletRequest;
 import ru.practicum.ewm.main.dto.event.*;
 import ru.practicum.ewm.main.dto.participationRequest.ParticipationRequestDto;
 
@@ -16,7 +17,7 @@ public interface EventService {
                                         String rangeStart, String rangeEnd, Boolean onlyAvailable,
                                         String sort, Integer from, Integer size);
 
-    EventFullDto getPublicEventById(Long eventId);
+    EventFullDto getPublicEventById(Long eventId,  HttpServletRequest request);
 
     List<EventShortDto> getPrivateUserEvents(Long userId, Integer from, Integer size);
 

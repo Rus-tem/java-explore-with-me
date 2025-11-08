@@ -1,11 +1,13 @@
 package ru.practicum.ewm.main.service.impl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.client.StatisticClient;
 import ru.practicum.ewm.main.dto.State;
 import ru.practicum.ewm.main.dto.event.*;
 import ru.practicum.ewm.main.dto.participationRequest.ParticipationRequestDto;
@@ -34,6 +36,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
+    private final StatisticClient statisticClient;
 
     //Admin. Поиск Event
     @Override
@@ -209,11 +212,9 @@ public class EventServiceImpl implements EventService {
 
     // Public. Получение Event по Id
     @Override
-    public EventFullDto getPublicEventById(Long eventId) {
+    public EventFullDto getPublicEventById(Long eventId,  HttpServletRequest request) {
 
-        // todo обращение в сервис статистики
-        // todo с уникального ip добавление только 1 просмотра views
-
+        statisticClient.endpointHit(request);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event не найден: " + eventId));
 
