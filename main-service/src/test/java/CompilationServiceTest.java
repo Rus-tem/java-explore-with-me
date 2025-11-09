@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.practicum.ewm.main.dto.compilation.CompilationDto;
 import ru.practicum.ewm.main.dto.compilation.NewCompilationDto;
 import ru.practicum.ewm.main.dto.compilation.UpdateCompilationRequest;
-import ru.practicum.ewm.main.exception.CategoryNotFoundException;
 import ru.practicum.ewm.main.exception.CompilationNotFoundException;
 import ru.practicum.ewm.main.exception.CompilationValidationException;
 import ru.practicum.ewm.main.model.Compilation;
@@ -136,7 +135,7 @@ public class CompilationServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(
-                CategoryNotFoundException.class,
+                CompilationNotFoundException.class,
                 () -> compilationService.deleteCompilation(5L)
         );
     }
