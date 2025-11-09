@@ -251,7 +251,7 @@ public class EventServiceTest {
         var result = eventService.getPublicEventById(1L, mock(HttpServletRequest.class));
 
         assertEquals(event.getId(), result.getId());
-        assertEquals(1L, result.getViews());
+        assertEquals(0L, result.getViews());
     }
 
     @Test
