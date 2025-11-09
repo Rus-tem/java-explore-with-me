@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.main.dto.compilation.CompilationDto;
 import ru.practicum.ewm.main.dto.compilation.NewCompilationDto;
 import ru.practicum.ewm.main.dto.compilation.UpdateCompilationRequest;
-import ru.practicum.ewm.main.exception.CategoryNotFoundException;
 import ru.practicum.ewm.main.exception.CompilationNotFoundException;
 import ru.practicum.ewm.main.exception.CompilationValidationException;
 import ru.practicum.ewm.main.mapper.CompilationMapper;
@@ -53,7 +52,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateRequest) {
 
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
-                new CategoryNotFoundException("Compilation с таким id = " + compId + " не найден"));
+                new CompilationNotFoundException("Compilation с таким id = " + compId + " не найден"));
 
         if (updateRequest.getTitle() != null) {
             compilation.setTitle(updateRequest.getTitle());
@@ -74,7 +73,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteCompilation(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->
-                new CategoryNotFoundException("Compilation с таким id = " + compId + " не найден"));
+                new CompilationNotFoundException("Compilation с таким id = " + compId + " не найден"));
         compilationRepository.delete(compilation);
     }
 
