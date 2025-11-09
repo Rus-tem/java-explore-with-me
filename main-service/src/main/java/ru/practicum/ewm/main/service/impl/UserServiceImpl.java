@@ -72,7 +72,6 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-
     // Private. Получение информации о заявках текущего пользователя на участие в событиях
     @Override
     public List<ParticipationRequestDto> getPrivateUserRequests(Long userId) {
@@ -121,18 +120,16 @@ public class UserServiceImpl implements UserService {
         return RequestMapper.mapToParticipationRequestDto(request);
     }
 
-
     // Private. Отмена своего запроса на участие в событии
     @Override
     public ParticipationRequestDto cancelPrivateRequest(Long userId, Long requestId) {
 
         ParticipationRequest request = requestRepository.findByIdAndRequesterId(requestId, userId)
                 .orElseThrow(() -> new RequestValidationException("Заявка не найдена"));
-        request.setStatus(RequestStatus.valueOf("CANCELED"));
+        request.setStatus(RequestStatus.CANCELED);
         requestRepository.save(request);
 
         return RequestMapper.mapToParticipationRequestDto(request);
-
     }
 
     // Проверка имени пользователя

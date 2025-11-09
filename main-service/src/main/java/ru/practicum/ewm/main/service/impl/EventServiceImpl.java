@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.client.StatisticClient;
+import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.main.dto.State;
 import ru.practicum.ewm.main.dto.event.*;
 import ru.practicum.ewm.main.dto.participationRequest.ParticipationRequestDto;
@@ -91,6 +92,7 @@ public class EventServiceImpl implements EventService {
                 throw new EventConflictException("Event " + eventId + " уже опубликован");
             } else if (request.getStateAction().equals(StateActionAdmin.PUBLISH_EVENT) && event.getState().equals(State.PENDING)) {
                 event.setState(State.PUBLISHED);
+                event.setPublishedOn(LocalDateTime.now());
             } else if (request.getStateAction().equals(StateActionAdmin.REJECT_EVENT) && event.getState().equals(State.PENDING)) {
                 event.setState(State.CANCELED);
                 eventRepository.save(event);
@@ -219,9 +221,17 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != State.PUBLISHED) {
             throw new EventNotFoundException("Event не опубликован: " + eventId);
         }
-        if (event.getViews() < 1) {
-            event.setViews(event.getViews() + 1);
+        LocalDateTime start = event.getCreatedOn();
+        LocalDateTime end = LocalDateTime.now();
+        List<ViewStats> stats = statisticClient.getStats(start, end,
+                List.of("/events/" + eventId),
+                true
+        );
+        long views = 0;
+        if (stats != null && !stats.isEmpty()) {
+            views = stats.get(0).getHits();
         }
+        event.setViews(views);
         eventRepository.save(event);
         statisticClient.endpointHit(request);
 
@@ -246,16 +256,20 @@ public class EventServiceImpl implements EventService {
 
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new CategoryNotFoundException("Category не найдена"));
+
         checkEvent(newEventDto);
         Event event = EventMapper.mapNewEventDtoToEvent(newEventDto, category, initiator);
-
         event.setConfirmedRequests(0L);
-        event.setPublishedOn(LocalDateTime.now());
+        event.setPublishedOn(null);
         event.setViews(0L);
         event.setState(State.PENDING);
         event.setCreatedOn(LocalDateTime.now());
-        if (event.getEventDate().isBefore(event.getPublishedOn())) {
-            throw new EventValidationException("Дата Event не может быть раньше даты публикации " + event.getPublishedOn());
+        if (newEventDto.getEventDate() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime getEventDate = LocalDateTime.parse(newEventDto.getEventDate(), formatter);
+            if (getEventDate.isBefore(event.getCreatedOn())) {
+                throw new EventValidationException("Дата Event не может быть раньше даты создания " + event.getEventDate());
+            }
         }
         Event saved = eventRepository.save(event);
 
@@ -273,6 +287,7 @@ public class EventServiceImpl implements EventService {
     // Private. Обновление Event текущим пользователем
     @Override
     public EventFullDto updatePrivateUserEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
+
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new EventConflictException("Event не найден или не принадлежит User"));
 
@@ -285,19 +300,22 @@ public class EventServiceImpl implements EventService {
                 return EventMapper.mapToEventFullDto(event);
             }
         }
-
         if (!(event.getState() == State.PENDING || event.getState() == State.CANCELED)) {
             throw new EventConflictException("Редактировать можно только Event в статусе PENDING или CANCELED");
         }
-
         if (updateRequest.getParticipantLimit() != null) {
             if (updateRequest.getParticipantLimit() < 0) {
                 throw new EventValidationException("Отрицательное значение участников Event");
             }
         }
         if (updateRequest.getEventDate() != null) {
+            if (event.getPublishedOn() == null) {
+                throw new EventValidationException("Данный Event еще не опубликован");
+            }
             if (updateRequest.getEventDate().isBefore(event.getPublishedOn())) {
                 throw new EventValidationException("Дата Event не может быть раньше чем дата публикации " + event.getPublishedOn());
+            } else {
+                event.setEventDate(updateRequest.getEventDate());
             }
         }
         EventMapper.updateEventFromUserRequest(updateRequest, event);
