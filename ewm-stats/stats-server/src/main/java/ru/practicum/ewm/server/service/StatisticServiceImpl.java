@@ -1,9 +1,7 @@
 package ru.practicum.ewm.server.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.server.exceptions.BadTimeRequest;
