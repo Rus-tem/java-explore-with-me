@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.ewm.dto.ViewStats;
 import ru.practicum.ewm.server.service.StatisticService;
@@ -33,13 +32,8 @@ public class StatisticController {
                                     @RequestParam(value = "end") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
                                     @RequestParam(value = "uris", required = false) List<String> uris,
                                     @RequestParam(value = "unique", required = false, defaultValue = "false") Boolean unique) {
+        return statisticService.getStats(start, end, uris, unique);
 
-        {
-            if (start.isAfter(end)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "'start' must be before 'end'");
-            }
-            return statisticService.getStats(start, end, uris, unique);
-        }
     }
 }
 
