@@ -14,19 +14,28 @@ import java.util.List;
 public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
     @Query("""
-                SELECT new ru.practicum.ewm.dto.ViewStats(
-                       eh.app,
-                       eh.uri,
-                       CASE WHEN :unique = true
-                            THEN COUNT(DISTINCT eh.ip)
-                            ELSE COUNT(eh) END)
-                FROM EndpointHit eh
-                WHERE eh.timestamp BETWEEN :start AND :end
-                  AND (:uri IS NULL OR eh.uri IN :uri)
-                GROUP BY eh.app, eh.uri
-                ORDER BY COUNT(eh) DESC
+            SELECT new ru.practicum.ewm.dto.ViewStats(
+                eh.app,
+                eh.uri,
+                CASE WHEN :unique = true
+                    THEN COUNT(DISTINCT eh.ip)
+                    ELSE COUNT(eh.ip)
+                END
+            )
+            FROM EndpointHit eh
+            WHERE eh.timestamp BETWEEN :start AND :end
+              AND (:uris IS NULL OR eh.uri IN :uris)
+            GROUP BY eh.app, eh.uri
+            ORDER BY
+                CASE WHEN :unique = true
+                    THEN COUNT(DISTINCT eh.ip)
+                    ELSE COUNT(eh.ip)
+                END DESC
             """)
-    List<ViewStats> getAllViewStats(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end,
-                                    @Param("uri") List<String> uri, @Param("unique") Boolean unique);
-
+    List<ViewStats> getAllViewStats(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("uris") List<String> uris,
+            @Param("unique") Boolean unique
+    );
 }

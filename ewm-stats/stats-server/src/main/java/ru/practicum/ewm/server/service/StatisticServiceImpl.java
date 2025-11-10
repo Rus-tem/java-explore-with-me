@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.EndpointHit;
 import ru.practicum.ewm.dto.ViewStats;
+import ru.practicum.ewm.server.exceptions.BadTimeRequest;
 import ru.practicum.ewm.server.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,10 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+
+        if (start.isAfter(end)) {
+            throw new BadTimeRequest("Время начала поиска должно быть раньше времени конца поиска");
+        }
         return endpointHitRepository.getAllViewStats(start, end, uris, unique);
     }
 }

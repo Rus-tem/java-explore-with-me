@@ -5,19 +5,19 @@ services:
     build:
       context: ./ewm-stats/stats-server
       dockerfile: Dockerfile
-    image: java-explore-with-me-stats
+    image: ewm-stats-server
     ports:
       - "9090:9090"
     depends_on:
-      - ewm-service
+      - stats-db-ref
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-service:5432/stats-db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db-ref:5432/stats-db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
 
-  ewm-service:
+  stats-db-ref:
     image: postgres:14-alpine
-    container_name: ewm-service
+    container_name: postgres-ewm-stats-db-ref
     ports:
       - "5432:5432"
     environment:
@@ -29,3 +29,34 @@ services:
       timeout: 3s
       interval: 3s
       retries: 10
+
+  ewm-service:
+    build: main-service
+    image: ewm-main-service
+    container_name: ewm-main-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - main-db-ref
+      - stats-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://main-db-ref:5432/main-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      SERVICES_STATISTICS-SERVICE_URL: http://stats-server:9090
+      JAVA_OPTS: -Djdk.httpclient.HttpClient.log=errors,requests
+
+  main-db-ref:
+        image: postgres:14-alpine
+        container_name: postgres-ewm-main-db-ref
+        ports:
+          - "5433:5432"
+        environment:
+          POSTGRES_DB: main-db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        healthcheck:
+           test: [ "CMD-SHELL", "pg_isready -q -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+           timeout: 3s
+           interval: 3s
+           retries: 10

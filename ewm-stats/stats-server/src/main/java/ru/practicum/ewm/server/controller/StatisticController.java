@@ -33,6 +33,7 @@ public class StatisticController {
                                     @RequestParam(value = "uris", required = false) List<String> uris,
                                     @RequestParam(value = "unique", required = false, defaultValue = "false") Boolean unique) {
         return statisticService.getStats(start, end, uris, unique);
-    }
 
+    }
 }
+
