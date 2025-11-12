@@ -79,7 +79,7 @@ public class EventServiceTest {
         newEventDto.setAnnotation("Это корректная аннотация события более 20 символов");
         newEventDto.setCategory(1L);
         newEventDto.setDescription("Это подробное описание события, больше 20 символов");
-        newEventDto.setEventDate("2025-11-11 20:39:00"); // <-- корректный формат для маппера
+        newEventDto.setEventDate("2025-12-11 20:39:00");
         Location location = new Location();
         location.setLat(55);
         location.setLon(37);

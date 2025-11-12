@@ -58,7 +58,10 @@ public class Event {
     @JoinColumn(name = "initiator_id", nullable = false)
     private User initiator;
 
-
+    public Event(Long id, State state) {
+        this.id = id;
+        this.state = state;
+    }
 }
 
 
