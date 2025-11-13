@@ -1,0 +1,740 @@
+{
+  "info": {
+    "name": "EWM Comments Tests",
+    "_postman_id": "feature_comments",
+    "description": "Тесты для проверки контроллеров Comment (Admin, Private, Public).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    {
+      "name": "Admin Comments",
+      "item": [
+        {
+          "name": "Admin - Получение списка Comment по параметрам",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                        "admin",
+                        "comments"
+                      ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Удаление Comment",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                   "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/comments/:eventId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                        "admin",
+                        "comments",
+                        ":eventId"
+                      ],
+                      "variable": [
+        { "key": "eventId", "value": "{{eventId}}" }
+      ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Private Comments",
+      "item": [
+        {
+          "name": "Private - Создание Comment",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                   "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+            "path": [
+                        "comments",
+                        ":userId",
+                        ":eventId"
+                      ],
+                      "variable": [
+        { "key": "userId", "value": "{{userId}}" },
+        {"key": "eventId", "value": "{{eventId}}"} 
+      ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"comment\": \"Test comment\"}"
+            }
+          }
+        },
+        {
+          "name": "Private - Изменение Comment",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                   "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/comments/:userId/:eventId/:commentId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+               "path": [
+                        "comments",
+                        ":userId",
+                        ":eventId",
+                        ":commentId"
+                      ],
+                      "variable": [
+        { "key": "userId", "value": "{{userId}}" },
+        {"key": "eventId", "value": "{{eventId}}"},
+        {"key": "commentId", "value": "{{commentId}}"}
+      ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"comment\": \"Updated comment\"}"
+            }
+
+          }
+        },
+        {
+          "name": "Private - Удаление Comment",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                   "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/comments/:userId/:eventId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                        "comments",
+                        ":userId",
+                        ":eventId"
+                      ],
+                      "variable": [
+        { "key": "userId", "value": "{{userId}}" },
+        {"key": "eventId", "value": "{{eventId}}"}
+      ]
+            }
+          }
+        },
+        {
+          "name": "Private - Получение списка Comment по параметрам",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                   "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                        "comments"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Comments",
+      "item": [
+        {
+          "name": "Public - Получение списка Comment по Id Event",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "const baseUrl = pm.collectionVariables.get(\"baseUrl\") || \"http://localhost:8080\";",
+                  "const randomSuffix = Math.floor(Math.random() * 10000);",
+                  "const user = {name: \"User\" + randomSuffix, email: `user${randomSuffix}@mail.com`};",
+                  "const category = {name: \"Category\" + randomSuffix};",
+                  "const event = {",
+                  "    annotation: \"AnnotationAnnotation\" + randomSuffix,",
+                  "    description: \"DescriptionDescription\" + randomSuffix,",
+                  "    eventDate: new Date(Date.now() + 36000000).toISOString().replace(\"T\", \" \").substring(0, 19),",
+                  "    location: {\"lat\": 55.75, \"lon\": 37.61},",
+                  "    paid: false,",
+                  "    participantLimit: 0,",
+                  "    requestModeration: false,",
+                  "    title: \"Event\" + randomSuffix,",
+                  "    category: category.id",
+                  "};",
+                  "const comment = {comment: \"Test comment\"};",
+                  "",
+                  "pm.collectionVariables.set(\"baseUrl\", baseUrl);",
+                  "",
+                  "const send = (options) => new Promise((resolve, reject) => {",
+                  "    pm.sendRequest(options, (err, res) => {",
+                  "        if (err) return reject(err);",
+                  "        resolve(res);",
+                  "    });",
+                  "});",
+                  "",
+                  "(async () => {",
+                  "    try {",
+                  "        let resUser = await send({url: baseUrl + \"/admin/users\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(user)}});",
+                  "        let userId = resUser.json().id;",
+                  "        pm.collectionVariables.set(\"userId\", userId);",
+                  "",
+                  "        let resCategory = await send({url: baseUrl + \"/admin/categories\", method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(category)}});",
+                  "        let categoryId = resCategory.json().id;",
+                  "        pm.collectionVariables.set(\"categoryId\", categoryId);",
+                  "",
+                  "        event.category = categoryId;",
+                  "        let resEvent = await send({url: baseUrl + `/users/${userId}/events`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(event)}});",
+                  "        let eventId = resEvent.json().id;",
+                  "        pm.collectionVariables.set(\"eventId\", eventId);",
+                  "",
+                  "        await send({url: baseUrl + `/admin/events/${eventId}`, method: \"PATCH\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify({stateAction: \"PUBLISH_EVENT\"})}});",
+                  "",
+                  "        let resComment = await send({url: baseUrl + `/comments/${userId}/${eventId}`, method: \"POST\", header: {\"Content-Type\": \"application/json\"}, body: {mode: \"raw\", raw: JSON.stringify(comment)}});",
+                  "        let commentId = resComment.json().id;",
+                  "        pm.collectionVariables.set(\"commentId\", commentId);",
+                  "    } catch (e) {",
+                  "        pm.expect.fail(\"Ошибка подготовки данных: \" + e);",
+                  "    }",
+                  "})();",
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                   "",
+                  "pm.test(\"Проверка статус-кода\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/comments/{eventId}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                        "public",
+                        "comments",
+                        ":eventId"
+                      ],
+                      "variable": [
+        { "key": "eventId", "value": "{{eventId}}" }
+      ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

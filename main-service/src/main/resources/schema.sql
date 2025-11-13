@@ -45,11 +45,15 @@ create TABLE IF NOT EXISTS requests(
     requester_id INT NOT NULL REFERENCES users(id) ON delete CASCADE,
     UNIQUE (event_id, requester_id));
 
-
-
 create TABLE IF NOT EXISTS compilation_events (
     compilation_id INT REFERENCES compilations(id) ON delete CASCADE,
     event_id INT REFERENCES events(id) ON delete CASCADE,
     PRIMARY KEY (compilation_id, event_id));
 
-
+create TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    comment VARCHAR(2000) NOT NULL,
+    event_id INT NOT NULL REFERENCES events(id) ON delete CASCADE,
+    user_id INT NOT NULL REFERENCES users(id) ON delete CASCADE,
+    created TIMESTAMP WITHOUT TIME ZONE
+    );
